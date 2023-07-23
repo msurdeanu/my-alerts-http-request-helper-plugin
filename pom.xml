@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.myalerts</groupId>
+    <artifactId>myalerts-http-request-helper-plugin</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <scm>
+        <connection>scm:git:https://github.com/msurdeanu/my-alerts-http-request-helper-plugin.git</connection>
+        <url>https://github.com/msurdeanu/my-alerts-http-request-helper-plugin</url>
+        <developerConnection>scm:git:https://github.com/msurdeanu/my-alerts-http-request-helper-plugin.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>MyAlerts HTTP Request Helper Plugin Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/msurdeanu/my-alerts-http-request-helper-plugin</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>MyAlerts API Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/msurdeanu/my-alerts-api</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <properties>
+        <project.scm.id>github</project.scm.id>
+
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <plugin.id>http-request-helper</plugin.id>
+        <plugin.class>org.myalerts.plugin.httprequesthelper.HttpRequestHelperPlugin</plugin.class>
+        <plugin.version>1.0.0</plugin.version>
+        <plugin.requires>1.0.0</plugin.requires>
+        <plugin.dependencies/>
+        <plugin.provider>https://myalerts.org</plugin.provider>
+        <plugin.description>Provides helper API for doing HTTP request inside test scenario definitions.</plugin.description>
+        <plugin.license>Apache License 2.0</plugin.license>
+
+        <pf4j-spring.version>0.8.0</pf4j-spring.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j-spring</artifactId>
+            <version>${pf4j-spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.myalerts</groupId>
+            <artifactId>my-alerts-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>unzip jar file</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}"
+                                       dest="target/plugin-classes"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Plugin-Id>${plugin.id}</Plugin-Id>
+                            <Plugin-Class>${plugin.class}</Plugin-Class>
+                            <Plugin-Version>${plugin.version}</Plugin-Version>
+                            <Plugin-Requires>${plugin.requires}</Plugin-Requires>
+                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
+                            <Plugin-Description>${plugin.description}</Plugin-Description>
+                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>
+                            <Plugin-License>${plugin.license}</Plugin-License>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
